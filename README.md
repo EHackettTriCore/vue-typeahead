@@ -35,7 +35,6 @@ Otherwise, the `mixins` way also works.
            @keydown.up="up"
            @keydown.enter="hit"
            @keydown.esc="reset"
-           @blur="reset"
            @input="update"/>
 
     <!-- the list -->
@@ -83,7 +82,12 @@ export default {
       queryParamName: 'search'
     }
   },
-
+  mounted: function () {
+    var that = this;
+    this.$nextTick(function () {
+      document.addEventListener('click', that.leave, false);
+    });
+  },
   methods: {
     // The callback function which is triggered when the user hits on an item
     // (required)
@@ -97,7 +101,23 @@ export default {
       // data = ...
       return data
     }
-  }
+    
+    // Check for that click location was outside of container
+    leave (e) {
+      // This checks to make sure that the click was on something other than this template it, input or ul.
+      if (!this.$el.contains(e.target)) {
+        this.reset;
+      }
+    },
+  },
+  mounted: function () {
+   // Add the event listener to the document on mount
+   document.addEventListener('click', this.leave, false);
+  },
+  destroyed: function () {
+  // Remove the event listener before being distroyed to prevent bubble up
+   document.removeEventListener('click', this.leave, false);
+  },
 }
 </script>
 
